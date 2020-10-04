@@ -1,4 +1,5 @@
 import { find, assign } from 'lodash'
+import { userMenuList } from './mock-data/user'
 
 const users = [
   { username: 'admin', password: 'admin', uuid: 'admin-uuid', name: 'Admin' },
@@ -26,6 +27,24 @@ export default ({ service, request, serviceForMock, requestForMock, mock, faker,
       url: '/login',
       method: 'post',
       data
+    })
+  },
+  /**
+   * @description 获取用户菜单权限
+   */
+  QUERY_USER_MENU_LIST (data = {}) {
+    // 模拟数据
+    mock
+      .onAny('/user/queryMenuList')
+      .reply(config => {
+        return tools.responseSuccess(assign([], userMenuList))
+      })
+    return requestForMock({
+      url: '/user/queryMenuList',
+      method: 'post',
+      data: {
+        ...data
+      }
     })
   }
 })
