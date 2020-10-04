@@ -3,6 +3,7 @@ import Adapter from 'axios-mock-adapter'
 import { get } from 'lodash'
 import util from '@/libs/util'
 import { errorLog, errorCreate } from './tools'
+import store from '@/store/index'
 
 /**
  * @description 创建请求实例
@@ -33,12 +34,11 @@ function createService () {
       } else {
         // 有 code 代表这是一个后端接口 可以进行进一步的判断
         switch (code) {
-          case 0:
-            // [ 示例 ] code === 0 代表没有错误
+          case '200':
             return dataAxios.data
-          case 'xxx':
-            // [ 示例 ] 其它和后台约定的 code
-            errorCreate(`[ code: xxx ] ${dataAxios.msg}: ${response.config.url}`)
+          case '201':
+            // 登录过期
+            store.dispatch('d2admin/account/logout', { confirm: false }, { root: true })
             break
           default:
             // 不是正确的 code
