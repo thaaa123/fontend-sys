@@ -127,12 +127,15 @@ export default {
       newTag.params = params || newTag.params
       newTag.query = query || newTag.query
       newTag.fullPath = fullPath || newTag.fullPath
+      console.log('newTag.meta', newTag.meta)
       // 添加进当前显示的页面数组
-      state.opened.push(newTag)
-      // 如果这个页面需要缓存 将其添加到缓存设置
-      if (isKeepAlive(newTag)) commit('keepAlivePush', tag.name)
-      // 持久化
-      await dispatch('opened2db')
+      if (newTag.meta && newTag.meta.title) {
+        state.opened.push(newTag)
+        // 如果这个页面需要缓存 将其添加到缓存设置
+        if (isKeepAlive(newTag)) commit('keepAlivePush', tag.name)
+        // 持久化
+        await dispatch('opened2db')
+      }
     },
     /**
      * @class current
@@ -145,8 +148,9 @@ export default {
       const opened = state.opened
       // 判断此页面是否已经打开 并且记录位置
       let pageOpendIndex = 0
+      const path = fullPath.split('?')[0]
       const pageOpend = opened.find((page, index) => {
-        const same = page.fullPath === fullPath
+        const same = page.fullPath.indexOf(path) > -1
         pageOpendIndex = same ? index : pageOpendIndex
         return same
       })
@@ -182,23 +186,39 @@ export default {
      * @param {Object} context
      * @param {Object} payload { tagName: 要关闭的标签名字 }
      */
-    async close ({ state, commit, dispatch }, { tagName }) {
+    async close ({ state, commit, dispatch }, { tagName, gotoTagName, params = {}, query = {} }) {
       // 预定下个新页面
       let newPage = {}
       const isCurrent = state.current === tagName
       // 如果关闭的页面就是当前显示的页面
       if (isCurrent) {
-        // 去找一个新的页面
         const len = state.opened.length
-        for (let i = 0; i < len; i++) {
-          if (state.opened[i].fullPath === tagName) {
-            newPage = i < len - 1 ? state.opened[i + 1] : state.opened[i - 1]
-            break
+        // 去找一个新的页面
+        if (gotoTagName) {
+          for (let i = 0; i < len; i++) {
+            if (state.opened[i].fullPath.indexOf(gotoTagName.split('?')[0]) > -1) {
+              newPage = state.opened[i]
+              break
+            }
+          }
+          if (!newPage.name) {
+            newPage = {
+              name: gotoTagName.replace('/', ''),
+              params,
+              query
+            }
+          }
+        } else {
+          for (let i = 0; i < len; i++) {
+            if (state.opened[i].fullPath.indexOf(tagName.split('?')[0]) > -1) {
+              newPage = i < len - 1 ? state.opened[i + 1] : state.opened[i - 1]
+              break
+            }
           }
         }
       }
       // 找到这个页面在已经打开的数据里是第几个
-      const index = state.opened.findIndex(page => page.fullPath === tagName)
+      const index = state.opened.findIndex(page => page.fullPath.indexOf(tagName.split('?')[0]) > -1)
       if (index >= 0) {
         // 如果这个页面是缓存的页面 将其在缓存设置中删除
         commit('keepAliveRemove', state.opened[index].name)

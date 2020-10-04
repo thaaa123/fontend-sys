@@ -23,7 +23,7 @@ export function parse (jsonString = '{}', defaultValue = {}) {
  * @param {String} msg 状态信息
  * @param {Number} code 状态码
  */
-export function response (data = {}, msg = '', code = 0) {
+export function response (data = {}, msg = '', code = '200') {
   return [
     200,
     { code, msg, data }
