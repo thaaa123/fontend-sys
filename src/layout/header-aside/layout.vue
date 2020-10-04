@@ -71,6 +71,8 @@
           </transition>
         </div>
       </div>
+      <!-- loading -->
+      <div class="loading" v-loading.body.fullscreen="isLoading" element-loading-background="rgba(255,255,255,.1)"></div>
     </div>
   </div>
 </template>
@@ -121,7 +123,8 @@ export default {
       grayActive: state => state.gray.active,
       transitionActive: state => state.transition.active,
       asideCollapse: state => state.menu.asideCollapse,
-      asideTransition: state => state.menu.asideTransition
+      asideTransition: state => state.menu.asideTransition,
+      isLoading: state => state.loading.isLoading
     }),
     ...mapGetters('d2admin', {
       themeActiveSetting: 'theme/activeSetting'

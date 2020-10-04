@@ -23,6 +23,7 @@ function createService () {
   // 响应拦截
   service.interceptors.response.use(
     response => {
+      store.commit('d2admin/loading/setIsLoading', false)
       // dataAxios 是 axios 返回数据中的 data
       const dataAxios = response.data
       // 这个状态码是和后端约定的
@@ -48,6 +49,7 @@ function createService () {
       }
     },
     error => {
+      store.commit('d2admin/loading/setIsLoading', false)
       const status = get(error, 'response.status')
       switch (status) {
         case 400: error.message = '请求错误'; break
@@ -76,6 +78,7 @@ function createService () {
  */
 function createRequestFunction (service) {
   return function (config) {
+    store.commit('d2admin/loading/setIsLoading', true)
     const token = util.cookies.get('token')
     const configDefault = {
       headers: {

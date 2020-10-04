@@ -2,7 +2,6 @@ import { uniqueId } from 'lodash'
 import util from '@/libs/util'
 import router, { createRoutesInLayout, routesOutLayout, resetRouter } from '@/router'
 import api from '@/api'
-import setting from '@/setting.js'
 
 const VUE_APP_DICT_MENU_TYPE_MENU = Number(process.env.VUE_APP_DICT_MENU_TYPE_MENU)
 const VUE_APP_DICT_VISIBLE_TRUE = Number(process.env.VUE_APP_DICT_VISIBLE_TRUE)
@@ -43,6 +42,7 @@ export default {
       // [ 路由 ] 计算路由(菜单路由和按钮点击跳转路由)
       const margeRoute = [...getRoutes(source), ...getOperationRoutes(source)]
       const routes = createRoutesInLayout(margeRoute).concat(routesOutLayout)
+      console.log('margeRoute', routes)
       // [ 路由 ] 重新设置路由
       resetRouter(routes)
       // [ 路由 ] 重新设置多标签页池
@@ -260,7 +260,7 @@ function getRoutes (menuSource) {
       }
       // 为动态注册的路由可以正常在演示环境上显示源码链接而设置，如果不需要显示源码的功能，请移除此属性
       // https://github.com/d2-projects/vue-filename-injector 只处理 .vue 类型的文件 所以需要在路由上设置源码路径信息
-      route.meta.source = 'src/views/' + sourceItem.route_component + (/(.js|.vue)$/.test(sourceItem.route_component) ? '' : '/index.js')
+      // route.meta.source = 'src/views/' + sourceItem.route_component + (/(.js|.vue)$/.test(sourceItem.route_component) ? '' : '/index.js')
       routes.push(route)
     }
     return routes
